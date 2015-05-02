@@ -22,7 +22,7 @@ namespace BleExplorer.Core.ViewModels
 
         public TestViewModel(IScreen hostScreen = null)
         {
-            hostScreen = hostScreen ?? Locator.Current.GetService<IScreen>();
+            HostScreen = hostScreen ?? Locator.Current.GetService<IScreen>();
             TheGuid = Guid.NewGuid().ToString();
         }
     }
