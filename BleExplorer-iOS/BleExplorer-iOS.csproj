@@ -85,6 +85,12 @@
     <CodesignProvision>Automatic:AppStore</CodesignProvision>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Robotics.Mobile.Core">
+      <HintPath>..\ext\Monkey.Robotics-0.5.2\core\Robotics.Mobile.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Robotics.Mobile.Core.iOS">
+      <HintPath>..\ext\Monkey.Robotics-0.5.2\ios\Robotics.Mobile.Core.iOS.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -139,9 +145,7 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Resources\" />
-  </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="packages.config" />
@@ -158,5 +162,8 @@
       <Project>{B5EB1AF2-8FC7-4338-B652-323CB083B09F}</Project>
       <Name>BleExplorer-Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\bluetooth.png" />
   </ItemGroup>
 </Project>

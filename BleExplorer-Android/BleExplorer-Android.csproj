@@ -41,6 +41,12 @@
     <ConsolePause>false</ConsolePause>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Robotics.Mobile.Core">
+      <HintPath>..\ext\Monkey.Robotics-0.5.2\core\Robotics.Mobile.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="Robotics.Mobile.Core.Droid">
+      <HintPath>..\ext\Monkey.Robotics-0.5.2\android\Robotics.Mobile.Core.Droid.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Xml" />
     <Reference Include="System.Core" />
@@ -129,5 +135,8 @@
       <Project>{B5EB1AF2-8FC7-4338-B652-323CB083B09F}</Project>
       <Name>BleExplorer-Core</Name>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <AndroidResource Include="Resources\drawable\bluetooth.png" />
   </ItemGroup>
 </Project>
