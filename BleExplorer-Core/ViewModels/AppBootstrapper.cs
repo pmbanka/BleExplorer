@@ -18,11 +18,15 @@ namespace BleExplorer.Core.ViewModels
             Router = new RoutingState();
             Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
 
-            // TODO: Register new views here, then navigate to the first page 
-            // in your app
-            Locator.CurrentMutable.Register(() => new TestView(), typeof(IViewFor<TestViewModel>));
+            BlobCache.ApplicationName = "BleExplorer";
 
-            Router.Navigate.Execute(new TestViewModel(this));
+            var adapter = Locator.Current.GetService<IAdapter>();
+            var rxAdapter = new RxBleAdapter(adapter);
+
+            Locator.CurrentMutable.Register(() => rxAdapter, typeof(IRxBleAdapter));
+            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof(IViewFor<FindDevicesViewModel>));
+
+            Router.Navigate.Execute(new FindDevicesViewModel(rxAdapter, this));
         }
 
         public Page CreateMainPage()
