@@ -20,6 +20,9 @@ namespace BleExplorer
         {
             base.OnCreate();
 
+            var adapter = new Robotics.Mobile.Core.Bluetooth.LE.Adapter();
+            Locator.CurrentMutable.RegisterConstant(adapter, typeof(Robotics.Mobile.Core.Bluetooth.LE.IAdapter));
+
             _autoSuspendHelper = new AutoSuspendHelper(this);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppBootstrapper();
 

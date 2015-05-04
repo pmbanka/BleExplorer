@@ -28,6 +28,7 @@ namespace BleExplorer
             _suspendHelper = new AutoSuspendHelper(this);
             _suspendHelper.FinishedLaunching(app, options);
 
+            Locator.CurrentMutable.RegisterConstant(Adapter.Current, typeof(IAdapter));
 
             _window = new UIWindow(UIScreen.MainScreen.Bounds);
             var bootstrapper = RxApp.SuspensionHost.GetAppState<AppBootstrapper>();
