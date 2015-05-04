@@ -16,7 +16,7 @@ using Xamarin.Forms;
 
 namespace BleExplorer.Views
 {
-    [Activity (Label = "BleExplorer-Android", MainLauncher = true)]
+    [Activity(Label = "BLE Explorer", MainLauncher = true)]
     public class MainActivity : AndroidActivity
     {
         protected override void OnCreate(Bundle bundle)
