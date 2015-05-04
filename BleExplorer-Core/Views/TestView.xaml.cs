@@ -1,31 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
-using Xamarin.Forms;
+﻿using BleExplorer.Core.ViewModels;
 using ReactiveUI;
-using BleExplorer.Core.ViewModels;
+using Xamarin.Forms;
 
 namespace BleExplorer.Core.Views
-{    
-    public partial class TestView : ContentPage, IViewFor<TestViewModel>
-    {    
-        public TestView ()
+{
+    public partial class TestView : IViewFor<TestViewModel>
+    {
+        public TestView()
         {
-            InitializeComponent ();
+            InitializeComponent();
 
-            this.OneWayBind(ViewModel, x => x.TheGuid, x => x.theGuid.Text);
+            this.OneWayBind(ViewModel, x => x.TheGuid, x => x.TheGuid.Text);
         }
 
-        public TestViewModel ViewModel {
-            get { return (TestViewModel)GetValue(ViewModelProperty); }
+        #region IViewFor<T>
+
+        public TestViewModel ViewModel
+        {
+            get { return (TestViewModel) GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
-        public static readonly BindableProperty ViewModelProperty =
-            BindableProperty.Create<TestView, TestViewModel>(x => x.ViewModel, default(TestViewModel), BindingMode.OneWay);
 
-        object IViewFor.ViewModel {
+        public static readonly BindableProperty ViewModelProperty =
+            BindableProperty.Create<TestView, TestViewModel>(x => x.ViewModel, default(TestViewModel));
+
+        object IViewFor.ViewModel
+        {
             get { return ViewModel; }
-            set { ViewModel = (TestViewModel)value; }
+            set { ViewModel = (TestViewModel) value; }
         }
+
+        #endregion
     }
 }
 

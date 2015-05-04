@@ -1,15 +1,17 @@
 ﻿using System;
 using Android.App;
 using Android.Runtime;
-using ReactiveUI;
 using BleExplorer.Core.ViewModels;
+using ReactiveUI;
+using Splat;
 
 namespace BleExplorer
 {
     [Application(Label = "BleExplorer-Android")]
     public class AndroidApplication : Application
     {
-        AutoSuspendHelper autoSuspendHelper;
+        // ReSharper disable once NotAccessedField.Local
+        AutoSuspendHelper _autoSuspendHelper;
         public AndroidApplication(IntPtr handle, JniHandleOwnership transfer) : base(handle,transfer)
         {
         }
@@ -17,11 +19,9 @@ namespace BleExplorer
         public override void OnCreate()
         {
             base.OnCreate();
-                        
-            autoSuspendHelper = new AutoSuspendHelper(this);
-            RxApp.SuspensionHost.CreateNewAppState = () => {
-                return new AppBootstrapper();
-            };
+
+            _autoSuspendHelper = new AutoSuspendHelper(this);
+            RxApp.SuspensionHost.CreateNewAppState = () => new AppBootstrapper();
 
             RxApp.SuspensionHost.SetupDefaultSuspendResume();
         }

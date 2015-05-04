@@ -1,9 +1,11 @@
-﻿using System;
-using ReactiveUI;
-using Splat;
+﻿using Akavache;
+using BleExplorer.Core.Models;
 using BleExplorer.Core.Views;
-using Xamarin.Forms;
+using ReactiveUI;
 using ReactiveUI.XamForms;
+using Robotics.Mobile.Core.Bluetooth.LE;
+using Splat;
+using Xamarin.Forms;
 
 namespace BleExplorer.Core.ViewModels
 {
@@ -29,4 +31,3 @@ namespace BleExplorer.Core.ViewModels
         }
     }
 }
-

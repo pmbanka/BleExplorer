@@ -1,20 +1,12 @@
-using System;
 using Android.App;
-using Android.Content;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 using Android.OS;
-using ReactiveUI;
-using System.Reactive;
-using System.Reactive.Linq;
 using BleExplorer.Core.ViewModels;
-using Akavache;
-using Xamarin.Forms.Platform.Android;
-using ReactiveUI.XamForms;
+using ReactiveUI;
+using Splat;
 using Xamarin.Forms;
+using Xamarin.Forms.Platform.Android;
 
-namespace BleExplorer.Views
+namespace BleExplorer
 {
     [Activity(Label = "BLE Explorer", MainLauncher = true)]
     public class MainActivity : AndroidActivity
@@ -25,7 +17,9 @@ namespace BleExplorer.Views
             Forms.Init(this, bundle);
 
             var bootstrapper = RxApp.SuspensionHost.GetAppState<AppBootstrapper>();
-            this.SetPage(bootstrapper.CreateMainPage());
+
+
+            SetPage(bootstrapper.CreateMainPage());
         }
     }
 }
