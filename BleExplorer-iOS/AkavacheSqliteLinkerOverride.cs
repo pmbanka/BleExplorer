@@ -10,7 +10,7 @@ namespace BleExplorer
     {
         static LinkerPreserve()
         {
-            throw new Exception(typeof(SQLitePersistentBlobCache).FullName);
+            throw new InvalidOperationException(typeof(SQLitePersistentBlobCache).FullName);
         }
     }
 
