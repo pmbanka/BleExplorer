@@ -145,7 +145,6 @@
       <HintPath>..\packages\Newtonsoft.Json.6.0.5\lib\portable-net45+wp80+win8+wpa81\Newtonsoft.Json.dll</HintPath>
     </Reference>
   </ItemGroup>
-  <ItemGroup />
   <ItemGroup>
     <None Include="Info.plist" />
     <None Include="packages.config" />
@@ -164,6 +163,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <BundleResource Include="Resources\bluetooth.png" />
+    <BundleResource Include="Resources\appbar_refresh.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="Resources\appbar_futurama_bender_cropped.png" />
   </ItemGroup>
 </Project>
