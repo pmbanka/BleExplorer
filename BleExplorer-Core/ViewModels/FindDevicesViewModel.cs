@@ -26,13 +26,12 @@ namespace BleExplorer.Core.ViewModels
             HostScreen = Ensure.NotNull(screen ?? Locator.Current.GetService<IScreen>(), "screen");
             _adapter = Ensure.NotNull(adapter ?? Locator.Current.GetService<IRxBleAdapter>(), "adapter");
 
-
             _isScanning = this.WhenAnyObservable(vm => vm._adapter.IsScanning)
                 .ToProperty(this, vm => vm.IsScanning, false, RxApp.MainThreadScheduler);
 
             ScanForDevices = ReactiveCommand.CreateAsyncTask(_ =>
             {
-                if (!IsScanning)
+                if (IsScanning)
                 {
                     _adapter.StopScanningForDevices();
                 }
