@@ -1,10 +1,9 @@
-﻿using System;
-using System.Reactive;
+﻿using System.Reactive;
+using System.Reactive.Linq;
 using System.Threading.Tasks;
 using BleExplorer.Core.Models;
 using BleExplorer.Core.Utils;
 using ReactiveUI;
-using Robotics.Mobile.Core.Bluetooth.LE;
 using Splat;
 
 namespace BleExplorer.Core.ViewModels
@@ -12,13 +11,14 @@ namespace BleExplorer.Core.ViewModels
     public interface IFindDevicesViewModel : IRoutableViewModel
     {
         ReactiveCommand<Unit> ScanForDevices { get; }
-
         bool IsScanning { get; }
+        int DetectedDevices { get; }
     }
 
     public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel
     {
         private readonly IRxBleAdapter _adapter;
+        private readonly ObservableAsPropertyHelper<int> _detectedDevices;
         private readonly ObservableAsPropertyHelper<bool> _isScanning;
 
         public FindDevicesViewModel(IRxBleAdapter adapter = null, IScreen screen = null)
@@ -29,6 +29,10 @@ namespace BleExplorer.Core.ViewModels
             _isScanning = this.WhenAnyObservable(vm => vm._adapter.IsScanning)
                 .ToProperty(this, vm => vm.IsScanning, false, RxApp.MainThreadScheduler);
 
+            _detectedDevices = this.WhenAnyObservable(vm => vm._adapter.ConnectedDevices)
+                .Select(p => p.Count)
+                .ToProperty(this, vm => vm.DetectedDevices, 0, RxApp.MainThreadScheduler);
+
             ScanForDevices = ReactiveCommand.CreateAsyncTask(_ =>
             {
                 if (IsScanning)
@@ -38,6 +42,11 @@ namespace BleExplorer.Core.ViewModels
                 _adapter.StartScanningForDevices();
                 return Task.FromResult(Unit.Default);
             });
+        }
+
+        public int DetectedDevices
+        {
+            get { return _detectedDevices.Value; }
         }
 
         public ReactiveCommand<Unit> ScanForDevices { get; private set; }

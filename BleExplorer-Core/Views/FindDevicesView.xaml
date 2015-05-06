@@ -8,6 +8,7 @@
   <ContentPage.Content>
     <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
       <Label x:Name="StateLabel" />
+      <Label x:Name="DetectedDevicesLabel" />
     </StackLayout>
   </ContentPage.Content>
 </ContentPage>

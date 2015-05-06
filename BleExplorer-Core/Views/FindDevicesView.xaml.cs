@@ -18,6 +18,8 @@ namespace BleExplorer.Core.Views
             this.OneWayBind(ViewModel, vm => vm.ScanForDevices, v => v.ScanToolbarButton.Command);
             this.OneWayBind(ViewModel, vm => vm.IsScanning, v => v.StateLabel.Text,
                 scanning => scanning ? "Scanning..." : "Not scanning");
+            this.OneWayBind(ViewModel, vm => vm.DetectedDevices, v => v.DetectedDevicesLabel.Text,
+                count => string.Format("Detected {0} devices", count));
         }
 
         #region IViewFor<T>
@@ -35,7 +37,7 @@ namespace BleExplorer.Core.Views
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (IFindDevicesViewModel)value; }
+            set { ViewModel = (IFindDevicesViewModel) value; }
         }
 
         #endregion
