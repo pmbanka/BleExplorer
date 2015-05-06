@@ -16,15 +16,17 @@ namespace BleExplorer.Core.ViewModels
         public AppBootstrapper()
         {
             Router = new RoutingState();
-            Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
+            Locator.CurrentMutable.RegisterConstant(this, typeof (IScreen));
 
             BlobCache.ApplicationName = "BleExplorer";
 
             var adapter = Locator.Current.GetService<IAdapter>();
             var rxAdapter = new RxBleAdapter(adapter);
 
-            Locator.CurrentMutable.Register(() => rxAdapter, typeof(IRxBleAdapter));
-            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof(IViewFor<FindDevicesViewModel>));
+            var dev = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
+
+            Locator.CurrentMutable.Register(() => rxAdapter, typeof (IRxBleAdapter));
+            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof (IViewFor<FindDevicesViewModel>));
 
             Router.Navigate.Execute(new FindDevicesViewModel(rxAdapter, this));
         }

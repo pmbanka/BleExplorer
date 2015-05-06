@@ -4,6 +4,7 @@ using Android.Runtime;
 using BleExplorer.Core.ViewModels;
 using ReactiveUI;
 using Splat;
+using XLabs.Platform.Device;
 
 namespace BleExplorer
 {
@@ -22,6 +23,7 @@ namespace BleExplorer
 
             var adapter = new Robotics.Mobile.Core.Bluetooth.LE.Adapter();
             Locator.CurrentMutable.RegisterConstant(adapter, typeof(Robotics.Mobile.Core.Bluetooth.LE.IAdapter));
+            Locator.CurrentMutable.RegisterConstant(AndroidDevice.CurrentDevice, typeof(IDevice));
 
             _autoSuspendHelper = new AutoSuspendHelper(this);
             RxApp.SuspensionHost.CreateNewAppState = () => new AppBootstrapper();

@@ -5,6 +5,7 @@ using ReactiveUI;
 using Robotics.Mobile.Core.Bluetooth.LE;
 using Splat;
 using Xamarin.Forms;
+using XLabs.Platform.Device;
 
 namespace BleExplorer
 {
@@ -29,6 +30,7 @@ namespace BleExplorer
             _suspendHelper.FinishedLaunching(app, options);
 
             Locator.CurrentMutable.RegisterConstant(Adapter.Current, typeof(IAdapter));
+            Locator.CurrentMutable.RegisterConstant(AppleDevice.CurrentDevice, typeof(XLabs.Platform.Device.IDevice));
 
             _window = new UIWindow(UIScreen.MainScreen.Bounds);
             var bootstrapper = RxApp.SuspensionHost.GetAppState<AppBootstrapper>();
