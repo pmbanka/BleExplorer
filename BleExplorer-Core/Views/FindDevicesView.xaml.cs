@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BleExplorer.Core.ViewModels;
@@ -20,6 +21,11 @@ namespace BleExplorer.Core.Views
                 scanning => scanning ? "Scanning..." : "Not scanning");
             this.OneWayBind(ViewModel, vm => vm.DetectedDevices, v => v.DetectedDevicesLabel.Text,
                 count => string.Format("Detected {0} devices", count));
+            this.OneWayBind(ViewModel, vm => vm.IsBluetoothOn, v => v.BluetoothState.Text,
+                state => string.Format("BL state: {0}", state));
+            this.WhenAnyValue(x => x.ViewModel.ScanForDevices)
+                .SelectMany(x => x.ExecuteAsync())
+                .Subscribe();
         }
 
         #region IViewFor<T>

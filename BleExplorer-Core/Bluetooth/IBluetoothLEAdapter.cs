@@ -1,75 +1,69 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Reactive.Subjects;
-using System.Text;
 using System.Threading.Tasks;
 using BleExplorer.Core.Utils;
 using JetBrains.Annotations;
 using Robotics.Mobile.Core.Bluetooth.LE;
+using XLabs.Platform.Device;
 
-namespace BleExplorer.Core.Models
+namespace BleExplorer.Core.Bluetooth
 {
-    public interface IRxBleAdapter
+    using IDevice = Robotics.Mobile.Core.Bluetooth.LE.IDevice;
+
+    public interface IBluetoothLeAdapter
     {
         IObservable<bool> IsScanning { get; }
 
         void StartScanningForDevices();
 
-        void StartScanningForDevices(Guid serviceUuid);
-
         void StopScanningForDevices();
 
         IObservable<IList<IDevice>> DiscoveredDevices { get; }
-
-        IObservable<IList<IDevice>> ConnectedDevices { get; }
-
-        void ConnectToDevice(IDevice device);
-
-        void DisconnectDevice(IDevice device);
     }
 
-    public class RxBleAdapter : IRxBleAdapter
+    public sealed class BluetoothLeAdapter : IBluetoothLeAdapter, IDisposable
     {
         [NotNull] private readonly IAdapter _adapter;
         [NotNull] private readonly BehaviorSubject<bool> _isScanningSubject;
-        private readonly IObservable<IList<IDevice>> _discoveredDevices;
-        private readonly IObservable<IList<IDevice>> _connectedDevices;
+        [NotNull] private readonly IObservable<IList<IDevice>> _discoveredDevices;
+        [NotNull] private readonly CompositeDisposable _disposables;
 
-        public RxBleAdapter(IAdapter adapter)
+        public BluetoothLeAdapter(IAdapter adapter, IObservable<bool> bluetoothOn)
         {
             _adapter = Ensure.NotNull(adapter, "adapter");
             _isScanningSubject = new BehaviorSubject<bool>(false);
 
             var deviceConnectedStream = Observable.FromEventPattern<DeviceConnectionEventArgs>(
                 ev => _adapter.DeviceConnected += ev,
-                ev => _adapter.DeviceConnected -= ev);
+                ev => _adapter.DeviceConnected -= ev)
+                .Subscribe(_ => { });
 
             var deviceDisconnectedStream = Observable.FromEventPattern<DeviceConnectionEventArgs>(
                 ev => _adapter.DeviceDisconnected += ev,
-                ev => _adapter.DeviceDisconnected -= ev);
-
-            // TODO implement IDisposable
-            Observable.FromEventPattern(
-                ev => _adapter.ScanTimeoutElapsed += ev,
-                ev => _adapter.ScanTimeoutElapsed -= ev)
-                .Subscribe(_ => updateIsScanning(false));
-
-            _connectedDevices = deviceConnectedStream
-                .Merge(deviceDisconnectedStream)
-                .Select(_ => _adapter.ConnectedDevices)
-                .Publish()
-                .RefCount();
+                ev => _adapter.DeviceDisconnected -= ev)
+                .Subscribe(_ => { });
 
             var deviceDiscoveredStream = Observable.FromEventPattern<DeviceDiscoveredEventArgs>(
                 ev => _adapter.DeviceDiscovered += ev,
                 ev => _adapter.DeviceDiscovered -= ev);
 
             _discoveredDevices = deviceDiscoveredStream
-                .Select(_ => _adapter.ConnectedDevices)
+                .Select(_ => _adapter.DiscoveredDevices)
                 .Publish()
                 .RefCount();
+
+            _disposables = new CompositeDisposable
+            {
+                Observable.FromEventPattern(
+                    ev => _adapter.ScanTimeoutElapsed += ev,
+                    ev => _adapter.ScanTimeoutElapsed -= ev)
+                    .Subscribe(_ => updateIsScanning(false)),
+                _isScanningSubject
+            };
         }
 
         public IObservable<bool> IsScanning
@@ -80,12 +74,6 @@ namespace BleExplorer.Core.Models
         public void StartScanningForDevices()
         {
             _adapter.StartScanningForDevices();
-            updateIsScanning();
-        }
-
-        public void StartScanningForDevices(Guid serviceUuid)
-        {
-            _adapter.StartScanningForDevices(serviceUuid);
             updateIsScanning();
         }
 
@@ -100,24 +88,14 @@ namespace BleExplorer.Core.Models
             get { return _discoveredDevices; }
         }
 
-        public IObservable<IList<IDevice>> ConnectedDevices
-        {
-            get { return _connectedDevices; }
-        }
-
-        public void ConnectToDevice(IDevice device)
-        {
-            _adapter.ConnectToDevice(device);
-        }
-
-        public void DisconnectDevice(IDevice device)
-        {
-            _adapter.DisconnectDevice(device);
-        }
-
         private void updateIsScanning(bool? state = null)
         {
             _isScanningSubject.OnNext(state ?? _adapter.IsScanning);
+        }
+
+        public void Dispose()
+        {
+            _disposables.Dispose();
         }
     }
 }

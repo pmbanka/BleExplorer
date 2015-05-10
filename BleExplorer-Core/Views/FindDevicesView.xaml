@@ -9,6 +9,7 @@
     <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
       <Label x:Name="StateLabel" />
       <Label x:Name="DetectedDevicesLabel" />
+      <Label x:Name="BluetoothState" />
     </StackLayout>
   </ContentPage.Content>
 </ContentPage>

@@ -1,5 +1,5 @@
 ﻿using Akavache;
-using BleExplorer.Core.Models;
+using BleExplorer.Core.Bluetooth;
 using BleExplorer.Core.Views;
 using ReactiveUI;
 using ReactiveUI.XamForms;
@@ -9,26 +9,25 @@ using Xamarin.Forms;
 
 namespace BleExplorer.Core.ViewModels
 {
-    public class AppBootstrapper : ReactiveObject, IScreen
+    public class AppBootstrapper : ReactiveObject, IScreen, IEnableLogger
     {
         public RoutingState Router { get; protected set; }
 
         public AppBootstrapper()
         {
             Router = new RoutingState();
-            Locator.CurrentMutable.RegisterConstant(this, typeof (IScreen));
+            Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
 
             BlobCache.ApplicationName = "BleExplorer";
 
             var adapter = Locator.Current.GetService<IAdapter>();
-            var rxAdapter = new RxBleAdapter(adapter);
+            var device = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
+            var btStatusProvider = new BluetoothStatusProvider(device.BluetoothHub);
+            var btLeAdapter = new BluetoothLeAdapter(adapter, btStatusProvider.IsBluetoothOn);
 
-            var dev = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
+            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof(IViewFor<FindDevicesViewModel>));
 
-            Locator.CurrentMutable.Register(() => rxAdapter, typeof (IRxBleAdapter));
-            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof (IViewFor<FindDevicesViewModel>));
-
-            Router.Navigate.Execute(new FindDevicesViewModel(rxAdapter, this));
+            Router.Navigate.Execute(new FindDevicesViewModel(btStatusProvider, btLeAdapter, this));
         }
 
         public Page CreateMainPage()
