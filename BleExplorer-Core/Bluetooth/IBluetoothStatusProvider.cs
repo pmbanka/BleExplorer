@@ -16,23 +16,23 @@ namespace BleExplorer.Core.Bluetooth
     public sealed class BluetoothStatusProvider : IBluetoothStatusProvider
     {
         private readonly IBluetoothHub _bluetoothHub;
-        private readonly BehaviorSubject<bool> _btOnSubject;
+        private IObservable<bool> _isBluetoothOn;
 
         public BluetoothStatusProvider(IBluetoothHub bluetoothHub)
         {
             _bluetoothHub = Ensure.NotNull(bluetoothHub, "bluetoothHub");
 
-            _btOnSubject = new BehaviorSubject<bool>(false);
-
-            Observable.Interval(TimeSpan.FromMilliseconds(100))
+            _isBluetoothOn = Observable.Interval(TimeSpan.FromMilliseconds(100))
                 .Select(_ => _bluetoothHub.Enabled)
                 .DistinctUntilChanged()
-                .Subscribe(_btOnSubject);
+                .Multicast(new BehaviorSubject<bool>(false))
+                .RefCount()
+                .DistinctUntilChanged();
         }
 
         public IObservable<bool> IsBluetoothOn
         {
-            get { return _btOnSubject.AsObservable(); }
+            get { return _isBluetoothOn; }
         }
 
         public Task OpenSettings()

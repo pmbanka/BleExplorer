@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Reactive;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Threading.Tasks;
 using BleExplorer.Core.Bluetooth;
@@ -15,7 +16,7 @@ namespace BleExplorer.Core.ViewModels
         bool IsBluetoothOn { get; }
     }
 
-    public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel
+    public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel, ISupportsActivation
     {
         private readonly IBluetoothLeAdapter _adapter;
         private readonly IBluetoothStatusProvider _statusProvider;
@@ -31,32 +32,36 @@ namespace BleExplorer.Core.ViewModels
             _statusProvider = Ensure.NotNull(
                 btStatusProvider ?? Locator.Current.GetService<IBluetoothStatusProvider>(), "btStatusProvider");
 
-            var btOn =
+            var bluetoothOn =
                 this.WhenAnyObservable(vm => vm._statusProvider.IsBluetoothOn).ObserveOn(RxApp.MainThreadScheduler);
 
-            btOn
-                .Where(p => p == false)
-                .Select(_ => new UserError(
-                    "Bluetooth is not turned on",
-                    "Turn on bluetooth",
-                    new[]
-                    {
-                        new RecoveryCommand("Open settings", __ =>
-                        {
-                            _statusProvider.OpenSettings();
-                            return RecoveryOptionResult.CancelOperation;
-                        }) {IsDefault = true},
-                        RecoveryCommand.Cancel
-                    }))
-                .SelectMany(UserError.Throw)
-                .CatchLogRepeat(this, "BL turned off")
-                .Subscribe();
+            bluetoothOn.ToProperty(this, vm => vm.IsBluetoothOn, out _isBluetoothOn);
 
-            _isBluetoothOn = btOn.ToProperty(this, vm => vm.IsBluetoothOn);
-
-            _detectedDevices = this.WhenAnyObservable(vm => vm._adapter.DiscoveredDevices)
+            this.WhenAnyObservable(vm => vm._adapter.DiscoveredDevices)
                 .Select(p => p.Count)
-                .ToProperty(this, vm => vm.DetectedDevices, 0, RxApp.MainThreadScheduler);
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .ToProperty(this, vm => vm.DetectedDevices, out _detectedDevices);
+
+            Activator = new ViewModelActivator();
+            this.WhenActivated(d =>
+            {
+                d(bluetoothOn
+                    .Where(p => p == false)
+                    .Select(_ => new UserError(
+                        "Bluetooth is not turned on",
+                        "Turn on bluetooth",
+                        new[]
+                        {
+                            RecoveryCommand.Cancel,
+                            new RecoveryCommand("Open settings", __ =>
+                            {
+                                _statusProvider.OpenSettings();
+                                return RecoveryOptionResult.CancelOperation;
+                            }) {IsDefault = true}
+                        }))
+                    .SelectMany(UserError.Throw)
+                    .Subscribe());
+            });
         }
 
         public bool IsBluetoothOn
@@ -75,5 +80,7 @@ namespace BleExplorer.Core.ViewModels
         }
 
         public IScreen HostScreen { get; private set; }
+
+        public ViewModelActivator Activator { get; private set; }
     }
 }

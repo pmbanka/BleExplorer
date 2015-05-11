@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reactive.Concurrency;
+using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,6 +22,7 @@ namespace BleExplorer.Core.Views
                 count => string.Format("Detected {0} devices", count));
             this.OneWayBind(ViewModel, vm => vm.IsBluetoothOn, v => v.BluetoothState.Text,
                 state => string.Format("BL state: {0}", state));
+            this.WhenActivated(d => d(Disposable.Empty));
         }
 
         #region IViewFor<T>

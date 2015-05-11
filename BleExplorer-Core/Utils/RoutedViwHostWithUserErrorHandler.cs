@@ -33,10 +33,12 @@ namespace BleExplorer.Core.Utils
 
         private async Task<RecoveryOptionResult> displayAlertWithOneOption(UserError error)
         {
+            var recoveryOption = error.RecoveryOptions[0];
             await DisplayAlert(
                 error.ErrorMessage,
                 error.ErrorCauseOrResolution,
-                error.RecoveryOptions[0].CommandName);
+                recoveryOption.CommandName);
+            recoveryOption.Execute(null);
             return RecoveryOptionResult.CancelOperation;
         }
 
@@ -47,9 +49,9 @@ namespace BleExplorer.Core.Utils
                 error.ErrorCauseOrResolution,
                 error.RecoveryOptions[0].CommandName,
                 error.RecoveryOptions[1].CommandName);
-            var recoveryOption = error.RecoveryOptions[result ? 1 : 0].RecoveryResult;
-            Debug.Assert(recoveryOption != null);
-            return recoveryOption.Value;
+            var recoveryOption = error.RecoveryOptions[result ? 0 : 1];
+            recoveryOption.Execute(null);
+            return recoveryOption.RecoveryResult ?? RecoveryOptionResult.CancelOperation;
         }
 
         private async Task<RecoveryOptionResult> displayAlertWithMultipleOptions(UserError error)
@@ -59,9 +61,9 @@ namespace BleExplorer.Core.Utils
                 error.RecoveryOptions[0].CommandName,
                 null,
                 error.RecoveryOptions.Skip(1).Select(p => p.CommandName).ToArray());
-            var recoveryOption = error.RecoveryOptions.Single(x => x.CommandName == result).RecoveryResult;
-            Debug.Assert(recoveryOption != null);
-            return recoveryOption.Value;
+            var recoveryOption = error.RecoveryOptions.Single(x => x.CommandName == result);
+            recoveryOption.Execute(null);
+            return recoveryOption.RecoveryResult ?? RecoveryOptionResult.CancelOperation;
         }
     }
 }
