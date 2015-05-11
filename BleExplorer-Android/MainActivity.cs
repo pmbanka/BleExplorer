@@ -18,13 +18,6 @@ namespace BleExplorer
             base.OnCreate(bundle);
             Forms.Init(this, bundle);
 
-            UserError.RegisterHandler(ue =>
-            {
-                var toast = Toast.MakeText(this, ue.ErrorMessage, ToastLength.Long);
-                toast.Show();
-                return Observable.Return(RecoveryOptionResult.CancelOperation);
-            });
-
             var bootstrapper = RxApp.SuspensionHost.GetAppState<AppBootstrapper>();
 
             SetPage(bootstrapper.CreateMainPage());
