@@ -1,6 +1,7 @@
 ﻿using System.Reactive.Linq;
 using Akavache;
 using BleExplorer.Core.Bluetooth;
+using BleExplorer.Core.Utils;
 using BleExplorer.Core.Views;
 using ReactiveUI;
 using Splat;
