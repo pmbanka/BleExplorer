@@ -1,86 +1,77 @@
 using System;
 using System.Collections.Generic;
-using System.Reactive;
-using System.Reactive.Disposables;
+using System.Linq;
 using System.Reactive.Linq;
-using System.Reactive.Subjects;
+using System.Threading;
 using System.Threading.Tasks;
 using BleExplorer.Core.Utils;
 using JetBrains.Annotations;
+using ReactiveUI;
 using Robotics.Mobile.Core.Bluetooth.LE;
-using XLabs.Platform.Device;
+using Splat;
 
 namespace BleExplorer.Core.Bluetooth
 {
-    using IDevice = Robotics.Mobile.Core.Bluetooth.LE.IDevice;
-
     public interface IBluetoothLeAdapter
     {
-        IObservable<bool> IsScanning { get; }
-
-        void StartScanningForDevices();
-
-        void StopScanningForDevices();
-
         IObservable<IList<IDevice>> DiscoveredDevices { get; }
     }
 
-    public sealed class BluetoothLeAdapter : IBluetoothLeAdapter, IDisposable
+    public sealed class BluetoothLeAdapter : IBluetoothLeAdapter, IEnableLogger
     {
         [NotNull] private readonly IAdapter _adapter;
-        [NotNull] private readonly BehaviorSubject<bool> _isScanningSubject;
         [NotNull] private readonly IObservable<IList<IDevice>> _discoveredDevices;
-        [NotNull] private readonly CompositeDisposable _disposables;
 
-        public BluetoothLeAdapter(IAdapter adapter, IObservable<bool> bluetoothOn)
+        public BluetoothLeAdapter(IAdapter adapter)
         {
             _adapter = Ensure.NotNull(adapter, "adapter");
-            _isScanningSubject = new BehaviorSubject<bool>(false);
-
-            var deviceConnectedStream = Observable.FromEventPattern<DeviceConnectionEventArgs>(
-                ev => _adapter.DeviceConnected += ev,
-                ev => _adapter.DeviceConnected -= ev)
-                .Subscribe(_ => { });
-
-            var deviceDisconnectedStream = Observable.FromEventPattern<DeviceConnectionEventArgs>(
-                ev => _adapter.DeviceDisconnected += ev,
-                ev => _adapter.DeviceDisconnected -= ev)
-                .Subscribe(_ => { });
 
             var deviceDiscoveredStream = Observable.FromEventPattern<DeviceDiscoveredEventArgs>(
                 ev => _adapter.DeviceDiscovered += ev,
                 ev => _adapter.DeviceDiscovered -= ev);
 
-            _discoveredDevices = deviceDiscoveredStream
-                .Select(_ => _adapter.DiscoveredDevices)
+            _discoveredDevices = Observable.Create<List<IDevice>>(obs =>
+            {
+                var devices = new List<DeviceUpdateInfo>();
+                var tokenSource = new CancellationTokenSource();
+                var subscription = deviceDiscoveredStream
+                    .Select(p => p.EventArgs.Device)
+                    .Subscribe(dev =>
+                    {
+                        var existingDevice = devices.SingleOrDefault(p => p.Device.ID == dev.ID);
+                        if (existingDevice == null)
+                        {
+                            devices.Add(new DeviceUpdateInfo(dev));
+                            obs.OnNext(devices.Select(p => p.Device).ToList());
+                        }
+                        else
+                        {
+                            existingDevice.IsDetected = true;
+                        }
+                    });
+                // ReSharper disable once UnusedVariable - task variable exists to remove unnecessary warning 
+                var task = Task.Run(async () =>
+                {
+                    while (!tokenSource.Token.IsCancellationRequested)
+                    {
+                        foreach (var dev in devices) dev.IsDetected = false;
+                        _adapter.StartScanningForDevices();
+                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        _adapter.StopScanningForDevices();
+                        devices.RemoveAll(p => !p.IsDetected);
+                        obs.OnNext(devices.Select(p => p.Device).ToList());
+                    }
+                }, tokenSource.Token);
+                return () =>
+                {
+                    tokenSource.Cancel();
+                    subscription.Dispose();
+                };
+            })
+                .LoggedCatch(this, (Exception _) => Observable.Empty<List<IDevice>>().Delay(TimeSpan.FromSeconds(0.5)))
+                .Repeat()
                 .Publish()
                 .RefCount();
-
-            _disposables = new CompositeDisposable
-            {
-                Observable.FromEventPattern(
-                    ev => _adapter.ScanTimeoutElapsed += ev,
-                    ev => _adapter.ScanTimeoutElapsed -= ev)
-                    .Subscribe(_ => updateIsScanning(false)),
-                _isScanningSubject
-            };
-        }
-
-        public IObservable<bool> IsScanning
-        {
-            get { return _isScanningSubject.AsObservable(); }
-        }
-
-        public void StartScanningForDevices()
-        {
-            _adapter.StartScanningForDevices();
-            updateIsScanning();
-        }
-
-        public void StopScanningForDevices()
-        {
-            _adapter.StopScanningForDevices();
-            updateIsScanning();
         }
 
         public IObservable<IList<IDevice>> DiscoveredDevices
@@ -88,14 +79,22 @@ namespace BleExplorer.Core.Bluetooth
             get { return _discoveredDevices; }
         }
 
-        private void updateIsScanning(bool? state = null)
+        private class DeviceUpdateInfo
         {
-            _isScanningSubject.OnNext(state ?? _adapter.IsScanning);
-        }
+            private readonly IDevice _device;
 
-        public void Dispose()
-        {
-            _disposables.Dispose();
+            public DeviceUpdateInfo(IDevice device)
+            {
+                _device = device;
+                IsDetected = true;
+            }
+
+            public bool IsDetected { get; set; }
+
+            public IDevice Device
+            {
+                get { return _device; }
+            }
         }
     }
 }
