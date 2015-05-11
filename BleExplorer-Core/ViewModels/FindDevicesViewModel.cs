@@ -49,11 +49,7 @@ namespace BleExplorer.Core.ViewModels
                         RecoveryCommand.Cancel
                     }))
                 .SelectMany(UserError.Throw)
-                .LoggedCatch(this,
-                    (Exception _) =>
-                        Observable.Return(RecoveryOptionResult.CancelOperation).Delay(TimeSpan.FromSeconds(2)),
-                    "Is BLE on stream")
-                .Repeat()
+                .CatchLogRepeat(this, "BL turned off")
                 .Subscribe();
 
             _isBluetoothOn = btOn.ToProperty(this, vm => vm.IsBluetoothOn);
