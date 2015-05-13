@@ -22,14 +22,14 @@ namespace BleExplorer.Core.ViewModels
             BlobCache.ApplicationName = "BleExplorer";
 
             Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
-            Locator.CurrentMutable.Register(() => new FindDevicesView(), typeof(IViewFor<FindDevicesViewModel>));
+            Locator.CurrentMutable.Register(() => new DevicesView(), typeof(IViewFor<DevicesViewModel>));
 
             var adapter = Locator.Current.GetService<Robotics.Mobile.Core.Bluetooth.LE.IAdapter>();
             var device = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
             var btStatusProvider = new BluetoothStatusProvider(device.BluetoothHub);
             var btLeAdapter = new BleAdapter(adapter);
 
-            Router.Navigate.Execute(new FindDevicesViewModel(btStatusProvider, btLeAdapter, this));
+            Router.Navigate.Execute(new DevicesViewModel(btStatusProvider, btLeAdapter, this));
         }
 
         public Page CreateMainPage()

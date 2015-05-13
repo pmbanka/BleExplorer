@@ -12,9 +12,9 @@ using Xamarin.Forms;
 
 namespace BleExplorer.Core.Views
 {
-    public partial class FindDevicesView : IViewFor<IFindDevicesViewModel>
+    public partial class DevicesView : IViewFor<IDevicesViewModel>
     {
-        public FindDevicesView()
+        public DevicesView()
         {
             InitializeComponent();
 
@@ -42,20 +42,20 @@ namespace BleExplorer.Core.Views
 
         #region IViewFor<T>
 
-        public IFindDevicesViewModel ViewModel
+        public IDevicesViewModel ViewModel
         {
-            get { return (IFindDevicesViewModel) GetValue(ViewModelProperty); }
+            get { return (IDevicesViewModel) GetValue(ViewModelProperty); }
             set { SetValue(ViewModelProperty, value); }
         }
 
         public static readonly BindableProperty ViewModelProperty =
-            BindableProperty.Create<FindDevicesView, IFindDevicesViewModel>(x => x.ViewModel,
-                default(IFindDevicesViewModel));
+            BindableProperty.Create<DevicesView, IDevicesViewModel>(x => x.ViewModel,
+                default(IDevicesViewModel));
 
         object IViewFor.ViewModel
         {
             get { return ViewModel; }
-            set { ViewModel = (IFindDevicesViewModel) value; }
+            set { ViewModel = (IDevicesViewModel) value; }
         }
 
         #endregion

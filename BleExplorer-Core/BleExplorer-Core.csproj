@@ -41,12 +41,12 @@
     <Compile Include="Bluetooth\IBluetoothStatusProvider.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\Ensure.cs" />
-    <Compile Include="ViewModels\FindDevicesViewModel.cs" />
+    <Compile Include="ViewModels\DevicesViewModel.cs" />
     <Compile Include="ViewModels\AppBootstrapper.cs" />
     <Compile Include="Utils\RoutedViewHostWithUserErrorHandler.cs" />
     <Compile Include="ViewModels\DeviceTileViewModel.cs" />
-    <Compile Include="Views\FindDevicesView.xaml.cs">
-      <DependentUpon>FindDevicesView.xaml</DependentUpon>
+    <Compile Include="Views\DevicesView.xaml.cs">
+      <DependentUpon>DevicesView.xaml</DependentUpon>
     </Compile>
     <Compile Include="Views\NegatingConverter.cs" />
   </ItemGroup>
@@ -109,7 +109,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Views\FindDevicesView.xaml">
+    <EmbeddedResource Include="Views\DevicesView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

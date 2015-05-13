@@ -7,14 +7,14 @@ using Splat;
 
 namespace BleExplorer.Core.ViewModels
 {
-    public interface IFindDevicesViewModel : IRoutableViewModel
+    public interface IDevicesViewModel : IRoutableViewModel
     {
         bool IsBluetoothOn { get; }
         ReactiveCommand<IBleDevice> DiscoverDevices { get; }
         IReadOnlyReactiveList<IDeviceTileViewModel> Devices { get; }
     }
 
-    public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel, ISupportsActivation
+    public sealed class DevicesViewModel : ReactiveObject, IDevicesViewModel, ISupportsActivation
     {
         private readonly IBleAdapter _adapter;
         private readonly ReactiveList<IBleDevice> _devices;
@@ -22,7 +22,7 @@ namespace BleExplorer.Core.ViewModels
         private readonly ObservableAsPropertyHelper<bool> _isBluetoothOn;
         private readonly IBluetoothStatusProvider _statusProvider;
 
-        public FindDevicesViewModel(
+        public DevicesViewModel(
             IBluetoothStatusProvider statusProvider = null,
             IBleAdapter adapter = null,
             IScreen screen = null)
