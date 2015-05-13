@@ -44,6 +44,7 @@
     <Compile Include="ViewModels\FindDevicesViewModel.cs" />
     <Compile Include="ViewModels\AppBootstrapper.cs" />
     <Compile Include="Utils\RoutedViewHostWithUserErrorHandler.cs" />
+    <Compile Include="ViewModels\DeviceTileViewModel.cs" />
     <Compile Include="Views\FindDevicesView.xaml.cs">
       <DependentUpon>FindDevicesView.xaml</DependentUpon>
     </Compile>

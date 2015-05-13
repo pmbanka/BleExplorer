@@ -15,6 +15,8 @@ namespace BleExplorer.Core.ViewModels
 
         public AppBootstrapper()
         {
+            this.Log().Debug("AppBootstrapper created.");
+
             Router = new RoutingState();
 
             BlobCache.ApplicationName = "BleExplorer";
@@ -25,14 +27,14 @@ namespace BleExplorer.Core.ViewModels
             var adapter = Locator.Current.GetService<Robotics.Mobile.Core.Bluetooth.LE.IAdapter>();
             var device = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
             var btStatusProvider = new BluetoothStatusProvider(device.BluetoothHub);
-            var btLeAdapter = new BluetoothLeAdapter(adapter);
+            var btLeAdapter = new BleAdapter(adapter);
 
             Router.Navigate.Execute(new FindDevicesViewModel(btStatusProvider, btLeAdapter, this));
         }
 
         public Page CreateMainPage()
         {
-            return new RoutedViwHostWithUserErrorHandler();
+            return new RoutedViewHostWithUserErrorHandler();
         }
     }
 }

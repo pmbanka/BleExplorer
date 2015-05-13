@@ -12,35 +12,56 @@ namespace BleExplorer.Core.ViewModels
 {
     public interface IFindDevicesViewModel : IRoutableViewModel
     {
-        int DetectedDevices { get; }
         bool IsBluetoothOn { get; }
+        ReactiveCommand<IBleDevice> DiscoverDevices { get; }
+        IReadOnlyReactiveList<IDeviceTileViewModel> Devices { get; }
     }
 
     public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel, ISupportsActivation
     {
-        private readonly IBluetoothLeAdapter _adapter;
+        private readonly IBleAdapter _adapter;
         private readonly IBluetoothStatusProvider _statusProvider;
 
-        private readonly ObservableAsPropertyHelper<int> _detectedDevices;
         private readonly ObservableAsPropertyHelper<bool> _isBluetoothOn;
+        private readonly ReactiveList<IBleDevice> _devices;
+        private readonly IReactiveDerivedList<IDeviceTileViewModel> _deviceTiles;
 
-        public FindDevicesViewModel(IBluetoothStatusProvider btStatusProvider = null,
-            IBluetoothLeAdapter btLeAdapter = null, IScreen screen = null)
+        public FindDevicesViewModel(
+            IBluetoothStatusProvider statusProvider = null,
+            IBleAdapter adapter = null,
+            IScreen screen = null)
         {
             HostScreen = Ensure.NotNull(screen ?? Locator.Current.GetService<IScreen>(), "screen");
-            _adapter = Ensure.NotNull(btLeAdapter ?? Locator.Current.GetService<IBluetoothLeAdapter>(), "btLeAdapter");
+            _adapter = Ensure.NotNull(adapter ?? Locator.Current.GetService<IBleAdapter>(), "adapter");
             _statusProvider = Ensure.NotNull(
-                btStatusProvider ?? Locator.Current.GetService<IBluetoothStatusProvider>(), "btStatusProvider");
+                statusProvider ?? Locator.Current.GetService<IBluetoothStatusProvider>(), "statusProvider");
+            _devices = new ReactiveList<IBleDevice>();
+            _deviceTiles = _devices.CreateDerivedCollection(p => new DeviceTileViewModel(p));
 
             var bluetoothOn =
-                this.WhenAnyObservable(vm => vm._statusProvider.IsBluetoothOn).ObserveOn(RxApp.MainThreadScheduler);
-
+                this.WhenAnyObservable(vm => vm._statusProvider.IsBluetoothOn)
+                    .ObserveOn(RxApp.MainThreadScheduler);
             bluetoothOn.ToProperty(this, vm => vm.IsBluetoothOn, out _isBluetoothOn);
 
-            this.WhenAnyObservable(vm => vm._adapter.DiscoveredDevices)
-                .Select(p => p.Count)
-                .ObserveOn(RxApp.MainThreadScheduler)
-                .ToProperty(this, vm => vm.DetectedDevices, out _detectedDevices);
+            DiscoverDevices = ReactiveCommand
+                .CreateAsyncObservable(bluetoothOn, _ =>
+                {
+                    _devices.Clear();
+                    return _adapter.DiscoverDevices();
+                });
+            DiscoverDevices.Subscribe(_devices.Add);
+            DiscoverDevices.ThrownExceptions
+                .Select(ex => new UserError(
+                    "Devices could not be discovered",
+                    null,
+                    new[]
+                    {
+                        RecoveryCommand.Cancel,
+                        new RecoveryCommand("Retry", _ => RecoveryOptionResult.RetryOperation)
+                    }))
+                .SelectMany(UserError.Throw)
+                .Where(p => p == RecoveryOptionResult.RetryOperation)
+                .InvokeCommand(DiscoverDevices);
 
             Activator = new ViewModelActivator();
             this.WhenActivated(d =>
@@ -57,7 +78,7 @@ namespace BleExplorer.Core.ViewModels
                             {
                                 _statusProvider.OpenSettings();
                                 return RecoveryOptionResult.CancelOperation;
-                            }) {IsDefault = true}
+                            })
                         }))
                     .SelectMany(UserError.Throw)
                     .Subscribe());
@@ -69,18 +90,20 @@ namespace BleExplorer.Core.ViewModels
             get { return _isBluetoothOn.Value; }
         }
 
-        public int DetectedDevices
-        {
-            get { return _detectedDevices.Value; }
-        }
-
         public string UrlPathSegment
         {
-            get { return "Find devices"; }
+            get { return "BLE Devices"; }
         }
 
         public IScreen HostScreen { get; private set; }
 
         public ViewModelActivator Activator { get; private set; }
+
+        public ReactiveCommand<IBleDevice> DiscoverDevices { get; private set; }
+
+        public IReadOnlyReactiveList<IDeviceTileViewModel> Devices
+        {
+            get { return _deviceTiles; }
+        }
     }
 }

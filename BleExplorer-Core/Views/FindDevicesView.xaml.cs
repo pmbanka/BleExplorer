@@ -18,7 +18,7 @@ namespace BleExplorer.Core.Views
         {
             InitializeComponent();
 
-            this.OneWayBind(ViewModel, vm => vm.DetectedDevices, v => v.DetectedDevicesLabel.Text,
+            this.OneWayBind(ViewModel, vm => vm.Devices.Count, v => v.DetectedDevicesLabel.Text,
                 count => string.Format("Detected {0} devices", count));
             this.OneWayBind(ViewModel, vm => vm.IsBluetoothOn, v => v.BluetoothState.Text,
                 state => string.Format("BL state: {0}", state));
