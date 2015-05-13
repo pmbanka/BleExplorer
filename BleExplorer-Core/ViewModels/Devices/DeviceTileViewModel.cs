@@ -1,6 +1,6 @@
 using BleExplorer.Core.Bluetooth;
 
-namespace BleExplorer.Core.ViewModels
+namespace BleExplorer.Core.ViewModels.Devices
 {
     public interface IDeviceTileViewModel
     {

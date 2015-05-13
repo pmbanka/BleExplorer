@@ -5,7 +5,7 @@ using BleExplorer.Core.Utils;
 using ReactiveUI;
 using Splat;
 
-namespace BleExplorer.Core.ViewModels
+namespace BleExplorer.Core.ViewModels.Devices
 {
     public interface IDevicesViewModel : IRoutableViewModel
     {

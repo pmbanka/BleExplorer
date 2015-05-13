@@ -2,7 +2,7 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="BleExplorer.Core.Views.DevicesView">
+             x:Class="BleExplorer.Core.Views.Devices.DevicesView">
     <ContentPage.ToolbarItems>
         <ToolbarItem x:Name="ScanToolbarButton" Name="Scan" Icon="appbar_refresh.png" />
     </ContentPage.ToolbarItems>
