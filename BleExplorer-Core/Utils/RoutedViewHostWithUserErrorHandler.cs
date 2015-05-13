@@ -7,27 +7,25 @@ using ReactiveUI.XamForms;
 
 namespace BleExplorer.Core.Utils
 {
-    internal class RoutedViwHostWithUserErrorHandler : RoutedViewHost
+    internal class RoutedViewHostWithUserErrorHandler : RoutedViewHost
     {
-        public RoutedViwHostWithUserErrorHandler()
+        public RoutedViewHostWithUserErrorHandler()
         {
             this.WhenActivated(d =>
                 d(UserError.RegisterHandler(async error =>
                 {
                     int recoveryCount = error.RecoveryOptions.Count;
-                    if (recoveryCount == 0)
+                    switch (recoveryCount)
                     {
-                        throw new InvalidOperationException("Cannot handle UserError without RecoveryOptions");
+                        case 0:
+                            throw new InvalidOperationException("Cannot handle UserError without RecoveryOptions");
+                        case 1:
+                            return await displayAlertWithOneOption(error);
+                        case 2:
+                            return await displayAlertWithTwoOptions(error);
+                        default:
+                            return await displayAlertWithMultipleOptions(error);
                     }
-                    if (recoveryCount == 1)
-                    {
-                        return await displayAlertWithOneOption(error);
-                    }
-                    if (recoveryCount == 2)
-                    {
-                        return await displayAlertWithTwoOptions(error);
-                    }
-                    return await displayAlertWithMultipleOptions(error);
                 })));
         }
 
