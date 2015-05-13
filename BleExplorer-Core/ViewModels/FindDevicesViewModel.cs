@@ -1,8 +1,5 @@
 ﻿using System;
-using System.Reactive;
-using System.Reactive.Disposables;
 using System.Reactive.Linq;
-using System.Threading.Tasks;
 using BleExplorer.Core.Bluetooth;
 using BleExplorer.Core.Utils;
 using ReactiveUI;
@@ -20,11 +17,10 @@ namespace BleExplorer.Core.ViewModels
     public sealed class FindDevicesViewModel : ReactiveObject, IFindDevicesViewModel, ISupportsActivation
     {
         private readonly IBleAdapter _adapter;
-        private readonly IBluetoothStatusProvider _statusProvider;
-
-        private readonly ObservableAsPropertyHelper<bool> _isBluetoothOn;
         private readonly ReactiveList<IBleDevice> _devices;
         private readonly IReactiveDerivedList<IDeviceTileViewModel> _deviceTiles;
+        private readonly ObservableAsPropertyHelper<bool> _isBluetoothOn;
+        private readonly IBluetoothStatusProvider _statusProvider;
 
         public FindDevicesViewModel(
             IBluetoothStatusProvider statusProvider = null,
@@ -96,14 +92,13 @@ namespace BleExplorer.Core.ViewModels
         }
 
         public IScreen HostScreen { get; private set; }
-
-        public ViewModelActivator Activator { get; private set; }
-
         public ReactiveCommand<IBleDevice> DiscoverDevices { get; private set; }
 
         public IReadOnlyReactiveList<IDeviceTileViewModel> Devices
         {
             get { return _deviceTiles; }
         }
+
+        public ViewModelActivator Activator { get; private set; }
     }
 }
