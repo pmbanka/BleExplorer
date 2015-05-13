@@ -16,7 +16,7 @@ namespace BleExplorer.Core.Bluetooth
     public sealed class BluetoothStatusProvider : IBluetoothStatusProvider
     {
         private readonly IBluetoothHub _bluetoothHub;
-        private IObservable<bool> _isBluetoothOn;
+        private readonly IObservable<bool> _isBluetoothOn;
 
         public BluetoothStatusProvider(IBluetoothHub bluetoothHub)
         {
