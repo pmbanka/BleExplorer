@@ -2,14 +2,23 @@
 
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:devices="clr-namespace:BleExplorer.Core.Views.Devices;assembly=BleExplorer-Core"
              x:Class="BleExplorer.Core.Views.Devices.DevicesView">
     <ContentPage.ToolbarItems>
         <ToolbarItem x:Name="ScanToolbarButton" Name="Scan" Icon="appbar_refresh.png" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
         <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-            <Label x:Name="DetectedDevicesLabel" />
-            <Label x:Name="BluetoothState" />
+            <ListView x:Name="DeviceTiles">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <ViewCell>
+                            <devices:DeviceTileView ViewModel="{Binding}" />
+                        </ViewCell>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Label x:Name="IsSearching" />
             <ActivityIndicator x:Name="ActivityIndicator" />
         </StackLayout>
     </ContentPage.Content>

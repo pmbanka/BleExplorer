@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reactive.Disposables;
 using System.Reactive.Linq;
 using BleExplorer.Core.ViewModels.Devices;
@@ -13,26 +14,25 @@ namespace BleExplorer.Core.Views.Devices
         {
             InitializeComponent();
 
-            this.BindCommand(ViewModel, vm => vm.DiscoverDevices, v => v.ScanToolbarButton);
-            this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.CanExecuteObservable)
-                .BindTo(this, v => v.ActivityIndicator.IsRunning, () => false, null, NegatingConverter.Instance.Value);
+            this.WhenActivated(onActivated);
+        }
 
-            this.OneWayBind(ViewModel, vm => vm.Devices.Count, v => v.DetectedDevicesLabel.Text,
-                count => string.Format("Detected {0} devices", count));
-            this.OneWayBind(ViewModel, vm => vm.IsBluetoothOn, v => v.BluetoothState.Text,
-                state => string.Format("BL state: {0}", state));
+        private IEnumerable<IDisposable> onActivated()
+        {
+            yield return this.BindCommand(ViewModel, vm => vm.DiscoverDevices, v => v.ScanToolbarButton);
+            yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
+                .BindTo(this, v => v.ActivityIndicator.IsRunning, () => false);
+            yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
+                .BindTo(this, v => v.ActivityIndicator.IsVisible, () => false);
 
-            this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.CanExecuteObservable)
-                .Where(canExecute => canExecute && !ViewModel.Devices.IsEmpty)
-                .Select(_ => ViewModel.DiscoverDevices)
-                .SelectMany(p => p.ExecuteAsync())
-                .Subscribe();
+            yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.CanExecuteObservable)
+                .Subscribe(p => IsSearching.Text = p ? "yup" : "nope");
+            yield return this.OneWayBind(ViewModel, vm => vm.Devices, v => v.DeviceTiles.ItemsSource);
 
-            this.WhenActivated(d =>
+            if (ViewModel.DiscoverDevices.CanExecute(null) && ViewModel.Devices.IsEmpty)
             {
                 ViewModel.DiscoverDevices.ExecuteAsync().Subscribe();
-                d(Disposable.Empty);
-            });
+            }
         }
 
         #region IViewFor<T>

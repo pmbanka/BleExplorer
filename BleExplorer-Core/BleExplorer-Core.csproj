@@ -46,10 +46,17 @@
     <Compile Include="ViewModels\AppBootstrapper.cs" />
     <Compile Include="Utils\RoutedViewHostWithUserErrorHandler.cs" />
     <Compile Include="ViewModels\Devices\DeviceTileViewModel.cs" />
+    <Compile Include="ViewModels\Services\ServicesViewModel.cs" />
     <Compile Include="Views\Devices\DevicesView.xaml.cs">
       <DependentUpon>DevicesView.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Views\Devices\DeviceTileView.xaml.cs">
+      <DependentUpon>DeviceTileView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\NegatingConverter.cs" />
+    <Compile Include="Views\Services\ServicesView.xaml.cs">
+      <DependentUpon>ServicesView.xaml</DependentUpon>
+    </Compile>
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <Import Project="..\packages\Xamarin.Forms.1.2.3.6257\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10\Xamarin.Forms.targets" Condition="Exists('..\packages\Xamarin.Forms.1.2.3.6257\build\portable-win+net45+wp80+MonoAndroid10+MonoTouch10\Xamarin.Forms.targets')" />
@@ -111,6 +118,18 @@
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Views\Devices\DevicesView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Devices\DeviceTileView.xaml">
+      <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Views\Services\ServicesView.xaml">
       <Generator>MSBuild:UpdateDesignTimeXaml</Generator>
       <SubType>Designer</SubType>
     </EmbeddedResource>

@@ -3,15 +3,17 @@ using Akavache;
 using BleExplorer.Core.Bluetooth;
 using BleExplorer.Core.Utils;
 using BleExplorer.Core.ViewModels.Devices;
+using BleExplorer.Core.ViewModels.Services;
 using BleExplorer.Core.Views;
 using BleExplorer.Core.Views.Devices;
+using BleExplorer.Core.Views.Services;
 using ReactiveUI;
 using Splat;
 using Xamarin.Forms;
 
 namespace BleExplorer.Core.ViewModels
 {
-    public class AppBootstrapper : ReactiveObject, IScreen, IEnableLogger
+    public class AppBootstrapper : ReactiveObject, IScreen
     {
         public RoutingState Router { get; protected set; }
 
@@ -25,6 +27,8 @@ namespace BleExplorer.Core.ViewModels
 
             Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
             Locator.CurrentMutable.Register(() => new DevicesView(), typeof(IViewFor<DevicesViewModel>));
+            Locator.CurrentMutable.Register(() => new DeviceTileView(), typeof(IViewFor<DeviceTileViewModel>));
+            Locator.CurrentMutable.Register(() => new ServicesView(), typeof(IViewFor<ServicesViewModel>));
 
             var adapter = Locator.Current.GetService<Robotics.Mobile.Core.Bluetooth.LE.IAdapter>();
             var device = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
