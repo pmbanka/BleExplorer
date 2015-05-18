@@ -34,7 +34,7 @@ namespace BleExplorer.Core.Utils
             var recoveryOption = error.RecoveryOptions[0];
             await DisplayAlert(
                 error.ErrorMessage,
-                error.ErrorCauseOrResolution,
+                error.ErrorCauseOrResolution ?? "",
                 recoveryOption.CommandName);
             recoveryOption.Execute(null);
             return RecoveryOptionResult.CancelOperation;
@@ -44,7 +44,7 @@ namespace BleExplorer.Core.Utils
         {
             var result = await DisplayAlert(
                 error.ErrorMessage,
-                error.ErrorCauseOrResolution,
+                error.ErrorCauseOrResolution ?? "",
                 error.RecoveryOptions[0].CommandName,
                 error.RecoveryOptions[1].CommandName);
             var recoveryOption = error.RecoveryOptions[result ? 0 : 1];

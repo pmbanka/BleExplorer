@@ -44,8 +44,8 @@ namespace BleExplorer.Core.Bluetooth
                     ev => _adapter.ScanTimeoutElapsed += ev,
                     ev => _adapter.ScanTimeoutElapsed -= ev)
                     .Select(_ => 0L)
-                    .Amb(Observable.Timer(TimeSpan.FromSeconds(8)))
-                    .Subscribe(_ => { obs.OnCompleted(); });
+                    .Amb(Observable.Timer(TimeSpan.FromSeconds(10)))
+                    .Subscribe(_ => obs.OnCompleted());
                 return new CompositeDisposable(
                     deviceDiscoveredSub,
                     timeoutSub,

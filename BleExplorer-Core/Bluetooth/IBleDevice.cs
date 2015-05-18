@@ -10,17 +10,19 @@ namespace BleExplorer.Core.Bluetooth
         Guid Id { get; }
         string Name { get; }
         IObservable<IBleService> DiscoverServices();
-        // IObservable<int> Rssi { get; }
-        // IObservable<DeviceState> State { get; }
     }
 
     public sealed class BleDevice : IBleDevice
     {
         private readonly IDevice _device;
+        private readonly string _name;
 
         public BleDevice(Robotics.Mobile.Core.Bluetooth.LE.IDevice device)
         {
             _device = Ensure.NotNull(device, "device");
+            _name = string.IsNullOrWhiteSpace(_device.Name) ? "Unknown" : _device.Name;
+            // IObservable<int> Rssi { get; }
+            // IObservable<DeviceState> State { get; }
         }
 
         public IObservable<IBleService> DiscoverServices()
@@ -35,7 +37,7 @@ namespace BleExplorer.Core.Bluetooth
 
         public string Name
         {
-            get { return _device.Name; }
+            get { return _name; }
         }
     }
 }
