@@ -5,7 +5,12 @@ namespace BleExplorer.Core.Views
 {
     public class NegatingConverter : IBindingTypeConverter
     {
-        internal static Lazy<NegatingConverter> Instance = new Lazy<NegatingConverter>();
+        private static readonly Lazy<NegatingConverter> instance = new Lazy<NegatingConverter>();
+
+        public static NegatingConverter Instance
+        {
+            get { return instance.Value; }
+        }
 
         public int GetAffinityForObjects(Type fromType, Type toType)
         {
