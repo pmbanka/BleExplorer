@@ -29,6 +29,12 @@ namespace BleExplorer.Core.Views.Devices
                 .Subscribe(p => IsSearching.Text = p ? "yup" : "nope");
             yield return this.OneWayBind(ViewModel, vm => vm.Devices, v => v.DeviceTiles.ItemsSource);
 
+            yield return DeviceTiles.Events().ItemTapped
+                .Select(p => (DeviceTileView) p.Item)
+                .Select(p => p.ViewModel.GoToServicesView)
+                .SelectMany(cmd => cmd.ExecuteAsync())
+                .Subscribe();
+
             if (ViewModel.DiscoverDevices.CanExecute(null) && ViewModel.Devices.IsEmpty)
             {
                 ViewModel.DiscoverDevices.ExecuteAsync().Subscribe();

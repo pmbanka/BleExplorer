@@ -17,17 +17,12 @@ namespace BleExplorer.Core.Views.Devices
             InitializeComponent();
 
             this.WhenActivated(onActivated);
-            //this.OneWayBind(ViewModel, vm => vm.Name, v => v.GoToServicesButton.Text);
-            //this.BindCommand(ViewModel, vm => vm.GoToServicesView, v => v.GoToServicesButton);
         }
 
         private IEnumerable<IDisposable> onActivated()
         {
             yield return this.OneWayBind(ViewModel, vm => vm.Name, v => v.NameLabel.Text);
             yield return this.OneWayBind(ViewModel, vm => vm.Id, v => v.GuidLabel.Text, p => p.ToString());
-            
-            
-            //this.Events().
         }
 
         #region IViewFor<T>

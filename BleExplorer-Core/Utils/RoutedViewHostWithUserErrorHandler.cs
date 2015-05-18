@@ -45,9 +45,9 @@ namespace BleExplorer.Core.Utils
             var result = await DisplayAlert(
                 error.ErrorMessage,
                 error.ErrorCauseOrResolution ?? "",
-                error.RecoveryOptions[0].CommandName,
-                error.RecoveryOptions[1].CommandName);
-            var recoveryOption = error.RecoveryOptions[result ? 0 : 1];
+                error.RecoveryOptions[1].CommandName,
+                error.RecoveryOptions[0].CommandName);
+            var recoveryOption = error.RecoveryOptions[result ? 1 : 0];
             recoveryOption.Execute(null);
             return recoveryOption.RecoveryResult ?? RecoveryOptionResult.CancelOperation;
         }
@@ -56,9 +56,12 @@ namespace BleExplorer.Core.Utils
         {
             var result = await DisplayActionSheet(
                 error.ErrorMessage,
-                error.RecoveryOptions[0].CommandName,
+                error.RecoveryOptions.Last().CommandName,
                 null,
-                error.RecoveryOptions.Skip(1).Select(p => p.CommandName).ToArray());
+                error.RecoveryOptions
+                    .Take(error.RecoveryOptions.Count - 1)
+                    .Select(p => p.CommandName)
+                    .ToArray());
             var recoveryOption = error.RecoveryOptions.Single(x => x.CommandName == result);
             recoveryOption.Execute(null);
             return recoveryOption.RecoveryResult ?? RecoveryOptionResult.CancelOperation;

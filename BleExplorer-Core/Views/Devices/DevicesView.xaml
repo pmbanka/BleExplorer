@@ -12,9 +12,7 @@
             <ListView x:Name="DeviceTiles">
                 <ListView.ItemTemplate>
                     <DataTemplate>
-                        <ViewCell>
-                            <devices:DeviceTileView ViewModel="{Binding}" />
-                        </ViewCell>
+                        <devices:DeviceTileView ViewModel="{Binding}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
