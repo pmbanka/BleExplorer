@@ -8,15 +8,15 @@
         <ToolbarItem x:Name="ScanToolbarButton" Name="Scan" Icon="appbar_refresh.png" />
     </ContentPage.ToolbarItems>
     <ContentPage.Content>
-        <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="CenterAndExpand">
-            <ListView x:Name="DeviceTiles">
+        <StackLayout Orientation="Vertical" HorizontalOptions="CenterAndExpand" VerticalOptions="StartAndExpand">
+            <ListView x:Name="DeviceTilesList">
                 <ListView.ItemTemplate>
                     <DataTemplate>
                         <devices:DeviceTileView ViewModel="{Binding}" />
                     </DataTemplate>
                 </ListView.ItemTemplate>
             </ListView>
-            <Label x:Name="IsSearching" />
+            <Label x:Name="EmptyListLabel" Text="No devices found" HorizontalOptions="CenterAndExpand" />
             <ActivityIndicator x:Name="ActivityIndicator" />
         </StackLayout>
     </ContentPage.Content>

@@ -25,7 +25,7 @@ namespace BleExplorer.Core.Bluetooth
             _isBluetoothOn = Observable.Interval(TimeSpan.FromMilliseconds(100))
                 .Select(_ => _bluetoothHub.Enabled)
                 .DistinctUntilChanged()
-                .Multicast(new BehaviorSubject<bool>(false))
+                .Multicast(new BehaviorSubject<bool>(true))
                 .RefCount()
                 .DistinctUntilChanged();
         }

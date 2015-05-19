@@ -16,13 +16,8 @@ namespace BleExplorer.Core.Views.Devices
         {
             InitializeComponent();
 
-            this.WhenActivated(onActivated);
-        }
-
-        private IEnumerable<IDisposable> onActivated()
-        {
-            yield return this.OneWayBind(ViewModel, vm => vm.Name, v => v.NameLabel.Text);
-            yield return this.OneWayBind(ViewModel, vm => vm.Id, v => v.GuidLabel.Text, p => p.ToString());
+            this.OneWayBind(ViewModel, vm => vm.Name, v => v.NameLabel.Text);
+            this.OneWayBind(ViewModel, vm => vm.Id, v => v.GuidLabel.Text, p => p.ToString());
         }
 
         #region IViewFor<T>

@@ -77,7 +77,7 @@ namespace BleExplorer.Core.ViewModels.Devices
                             })
                         }))
                     .SelectMany(UserError.Throw)
-                    .Subscribe());
+                    .Subscribe(_ => _devices.Clear()));
             });
         }
 

@@ -13,27 +13,24 @@ namespace BleExplorer.Core.Views.Devices
         public DevicesView()
         {
             InitializeComponent();
-
             this.WhenActivated(onActivated);
         }
 
         private IEnumerable<IDisposable> onActivated()
         {
+            yield return this.OneWayBind(ViewModel, vm => vm.Devices.IsEmpty, v => v.EmptyListLabel.IsVisible, () => true);
+            yield return this.OneWayBind(ViewModel, vm => vm.Devices.IsEmpty, v => v.DeviceTilesList.IsVisible, () => false,
+                vmToViewConverterOverride: NegatingConverter.Instance);
             yield return this.BindCommand(ViewModel, vm => vm.DiscoverDevices, v => v.ScanToolbarButton);
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
                 .BindTo(this, v => v.ActivityIndicator.IsRunning, () => false);
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
                 .BindTo(this, v => v.ActivityIndicator.IsVisible, () => false);
-
-            yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.CanExecuteObservable)
-                .Subscribe(p => IsSearching.Text = p ? "yup" : "nope");
-            yield return this.OneWayBind(ViewModel, vm => vm.Devices, v => v.DeviceTiles.ItemsSource);
-
-            yield return DeviceTiles.Events().ItemTapped
-                .Select(p => (DeviceTileView) p.Item)
-                .Select(p => p.ViewModel.GoToServicesView)
-                .SelectMany(cmd => cmd.ExecuteAsync())
-                .Subscribe();
+            yield return this.OneWayBind(ViewModel, vm => vm.Devices, v => v.DeviceTilesList.ItemsSource);
+            yield return DeviceTilesList.Events().ItemTapped
+                .Select(p => (IDeviceTileViewModel) p.Item)
+                .SelectMany(p => p.GoToServicesView.ExecuteAsync())
+                .Subscribe(_ => DeviceTilesList.SelectedItem = null);
 
             if (ViewModel.DiscoverDevices.CanExecute(null) && ViewModel.Devices.IsEmpty)
             {
