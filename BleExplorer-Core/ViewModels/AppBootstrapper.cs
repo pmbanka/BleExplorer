@@ -33,8 +33,12 @@ namespace BleExplorer.Core.ViewModels
             var adapter = Locator.Current.GetService<Robotics.Mobile.Core.Bluetooth.LE.IAdapter>();
             var device = Locator.Current.GetService<XLabs.Platform.Device.IDevice>();
             var btStatusProvider = new BluetoothStatusProvider(device.BluetoothHub);
-            var btLeAdapter = new BleAdapter(adapter);
 
+#if (SIMULATOR)
+            var btLeAdapter = new Simulator.BleAdapterSim();
+#else
+            var btLeAdapter = new BleAdapter(adapter);
+#endif
             Router.Navigate.Execute(new DevicesViewModel(btStatusProvider, btLeAdapter, this));
         }
 
