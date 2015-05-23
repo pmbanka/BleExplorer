@@ -9,7 +9,7 @@ using Splat;
 
 namespace BleExplorer.Core.ViewModels.Devices
 {
-    public interface IDeviceTileViewModel
+    public interface IDeviceTileViewModel : IReactiveObject
     {
         Guid Id { get; }
         string Name { get; }

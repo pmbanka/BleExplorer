@@ -33,52 +33,26 @@ namespace BleExplorer.Core.ViewModels.Devices
                 statusProvider ?? Locator.Current.GetService<IBluetoothStatusProvider>(), "statusProvider");
             _devices = new ReactiveList<IBleDevice>();
             _deviceTiles = _devices.CreateDerivedCollection(p => new DeviceTileViewModel(p));
+            Activator = new ViewModelActivator();
 
             var bluetoothOn =
                 this.WhenAnyObservable(vm => vm._statusProvider.IsBluetoothOn)
                     .ObserveOn(RxApp.MainThreadScheduler);
             bluetoothOn.ToProperty(this, vm => vm.IsBluetoothOn, out _isBluetoothOn);
 
-            DiscoverDevices = ReactiveCommand
-                .CreateAsyncObservable(bluetoothOn, _ =>
-                {
-                    _devices.Clear();
-                    return _adapter.DiscoverDevices();
-                });
+            DiscoverDevices = ReactiveCommand.CreateAsyncObservable(bluetoothOn, discoverDevicesImpl);
             DiscoverDevices.Subscribe(_devices.Add);
             DiscoverDevices.ThrownExceptions
-                .Select(ex => new UserError(
-                    "Devices could not be discovered",
-                    null,
-                    new[]
-                    {
-                        RecoveryCommand.Cancel,
-                        new RecoveryCommand("Retry", _ => RecoveryOptionResult.RetryOperation)
-                    }))
+                .Select(discoverDevicesUserError)
                 .SelectMany(UserError.Throw)
                 .Where(p => p == RecoveryOptionResult.RetryOperation)
                 .InvokeCommand(DiscoverDevices);
 
-            Activator = new ViewModelActivator();
-            this.WhenActivated(d =>
-            {
-                d(bluetoothOn
-                    .Where(p => p == false)
-                    .Select(_ => new UserError(
-                        "Bluetooth is not turned on",
-                        "Turn on bluetooth",
-                        new[]
-                        {
-                            RecoveryCommand.Cancel,
-                            new RecoveryCommand("Open settings", __ =>
-                            {
-                                _statusProvider.OpenSettings();
-                                return RecoveryOptionResult.CancelOperation;
-                            })
-                        }))
-                    .SelectMany(UserError.Throw)
-                    .Subscribe(_ => _devices.Clear()));
-            });
+            this.WhenActivated(d => d(bluetoothOn
+                .Where(p => p == false)
+                .Select(bluetoothOffUserError)
+                .SelectMany(UserError.Throw)
+                .Subscribe(_ => _devices.Clear())));
         }
 
         public bool IsBluetoothOn
@@ -100,5 +74,35 @@ namespace BleExplorer.Core.ViewModels.Devices
         }
 
         public ViewModelActivator Activator { get; private set; }
+
+        private UserError bluetoothOffUserError(bool _)
+        {
+            return new UserError("Bluetooth is not turned on", "Turn on bluetooth",
+                new[]
+                {
+                    RecoveryCommand.Cancel,
+                    new RecoveryCommand("Open settings", __ =>
+                    {
+                        _statusProvider.OpenSettings();
+                        return RecoveryOptionResult.CancelOperation;
+                    })
+                });
+        }
+
+        private UserError discoverDevicesUserError(Exception ex)
+        {
+            return new UserError("Devices could not be discovered", null,
+                new[]
+                {
+                    RecoveryCommand.Cancel,
+                    new RecoveryCommand("Retry", _ => RecoveryOptionResult.RetryOperation)
+                });
+        }
+
+        private IObservable<IBleDevice> discoverDevicesImpl(object _)
+        {
+            _devices.Clear();
+            return _adapter.DiscoverDevices();
+        }
     }
 }
