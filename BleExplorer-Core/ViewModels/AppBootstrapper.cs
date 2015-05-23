@@ -27,7 +27,7 @@ namespace BleExplorer.Core.ViewModels
 
             Locator.CurrentMutable.RegisterConstant(this, typeof(IScreen));
             Locator.CurrentMutable.Register(() => new DevicesView(), typeof(IViewFor<DevicesViewModel>));
-            Locator.CurrentMutable.Register(() => new DeviceTileView(), typeof(IViewFor<DeviceTileViewModel>));
+            Locator.CurrentMutable.Register(() => new ServiceTileView(), typeof(IViewFor<DeviceTileViewModel>));
             Locator.CurrentMutable.Register(() => new ServicesView(), typeof(IViewFor<ServicesViewModel>));
 
             var adapter = Locator.Current.GetService<Robotics.Mobile.Core.Bluetooth.LE.IAdapter>();
