@@ -34,5 +34,16 @@ namespace BleExplorer.Core.Simulator
                 new BleServiceSim()
             }.ToObservable().Delay(TimeSpan.FromMilliseconds(200), RxApp.TaskpoolScheduler);
         }
+
+
+        public IObservable<int> Rssi
+        {
+            get { return Observable.Return(123); }
+        }
+
+        public IObservable<BleDeviceState> State
+        {
+            get { return Observable.Return(BleDeviceState.Connected); }
+        }
     }
 }

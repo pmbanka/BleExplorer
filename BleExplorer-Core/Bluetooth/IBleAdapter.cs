@@ -36,7 +36,7 @@ namespace BleExplorer.Core.Bluetooth
                     ev => _adapter.DeviceDiscovered -= ev);
                 var deviceDiscoveredSub = deviceDiscoveredStream
                     .Select(p => p.EventArgs.Device)
-                    .Select(dev => new BleDevice(dev))
+                    .Select(dev => new BleDevice(dev, _adapter))
                     .Subscribe(obs);
                 _adapter.StartScanningForDevices();
 
