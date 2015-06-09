@@ -21,6 +21,7 @@ namespace BleExplorer.Core.Views.Services
 
         private IEnumerable<IDisposable> onActivated()
         {
+            yield return this.OneWayBind(ViewModel, vm => vm.Services.IsEmpty, v => v.EmptyListLabel.IsVisible, () => true);
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverServices.IsExecuting)
                 .BindTo(this, v => v.ActivityIndicator.IsRunning, () => false);
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverServices.IsExecuting)

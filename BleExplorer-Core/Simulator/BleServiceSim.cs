@@ -1,4 +1,5 @@
 using System;
+using System.Reactive.Linq;
 using BleExplorer.Core.Bluetooth;
 
 namespace BleExplorer.Core.Simulator
@@ -33,7 +34,7 @@ namespace BleExplorer.Core.Simulator
 
         public IObservable<IBleCharacteristic> DiscoverCharacteristics()
         {
-            throw new NotImplementedException();
+            return Observable.Empty<IBleCharacteristic>();
         }
     }
 }

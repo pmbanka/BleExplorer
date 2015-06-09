@@ -7,7 +7,7 @@
         <Label x:Name="NameLabel" YAlign="Center" Font="Medium" />
         <StackLayout VerticalOptions="StartAndExpand" Orientation="Horizontal">
             <Label x:Name="GuidLabel" Font="Micro" />
-            <Label x:Name="PrimaryLabel" Font="Micro" /> 
+            <Label x:Name="PrimaryLabel" Font="Micro" />
         </StackLayout>
     </StackLayout>
 </ViewCell>

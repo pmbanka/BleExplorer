@@ -22,11 +22,13 @@ namespace BleExplorer.Core.Views.Devices
             yield return this.OneWayBind(ViewModel, vm => vm.Devices.IsEmpty, v => v.DeviceTilesList.IsVisible, () => false,
                 vmToViewConverterOverride: NegatingConverter.Instance);
             yield return this.BindCommand(ViewModel, vm => vm.DiscoverDevices, v => v.ScanToolbarButton);
+            
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
                 .BindTo(this, v => v.ActivityIndicator.IsRunning, () => false);
             yield return this.WhenAnyObservable(v => v.ViewModel.DiscoverDevices.IsExecuting)
                 .BindTo(this, v => v.ActivityIndicator.IsVisible, () => false);
             yield return this.OneWayBind(ViewModel, vm => vm.Devices, v => v.DeviceTilesList.ItemsSource);
+            
             yield return DeviceTilesList.Events().ItemTapped
                 .Select(p => (IDeviceTileViewModel) p.Item)
                 .SelectMany(p => p.GoToServicesView.ExecuteAsync())
