@@ -27,7 +27,7 @@ namespace BleExplorer.Core.ViewModels.Devices
             screen = Ensure.NotNull(screen ?? Locator.Current.GetService<IScreen>(), "screen");
             Id = device.Id;
             Name = device.Name;
-            GoToServicesView = screen.Router.NavigateCommandFor(new ServicesViewModel(device, screen));
+            GoToServicesView = screen.Router.NavigateCommandFor(() => new ServicesViewModel(device, screen));
         }
 
         public Guid Id

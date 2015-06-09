@@ -28,5 +28,13 @@ namespace BleExplorer.Core.Utils
                 router.Navigate.CanExecuteObservable,
                 _ => router.Navigate.ExecuteAsync(viewModel).ToUnit());
         }
+
+        public static ReactiveCommand<Unit> NavigateCommandFor<T>(this RoutingState router, Func<T> viewModelFactory)
+            where T : IRoutableViewModel
+        {
+            return ReactiveCommand.CreateAsyncObservable(
+                router.Navigate.CanExecuteObservable,
+                _ => router.Navigate.ExecuteAsync(viewModelFactory()).ToUnit());
+        }
     }
 }
